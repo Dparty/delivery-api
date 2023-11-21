@@ -1,0 +1,239 @@
+openapi: 3.0.3
+info:
+  title: Delivery APIs
+  description: |-
+    Dparty
+  contact:
+    email: chenyunda218@gmail.com
+  version: 0.0.1
+servers:
+  - url: https://localhost:8080
+  - url: https://delivery-uat.sum-foods.com
+  - url: https://delivery.sum-foods.com
+tags:
+  - name: Restaurant
+paths:
+  /restaurants:
+    get:
+      tags: [Restaurant]
+      operationId: SearchRestaurant
+      parameters:
+        - name: x
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: y
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: index
+          in: query
+          description: 'Current page index'
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantList'
+  /restaurants/{id}:
+    get:
+      tags: [Restaurant]
+      operationId: GetRestaurant
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+components:
+  schemas:
+    Restaurant:
+      type: object
+      description: 'Restaurant'
+      required:
+        - id
+        - name
+        - description
+        - items
+        - tables
+      properties:
+        id:
+          type: string
+        icon:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        items:
+          type: array
+          items: 
+            $ref: '#/components/schemas/Item'
+    RestaurantList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Restaurant'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    Pair:
+      type: object
+      required:
+        - left
+        - right
+      properties:
+        left:
+          type: string
+        right:
+          type: string
+    ItemList:
+      type: object
+      required:
+        - data
+        - pagination
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    ItemStatus:
+      type: string
+      enum: [ACTIVED,DEACTIVED]
+    Item:
+      type: object
+      description: 'Item'
+      required:
+        - id
+        - name
+        - pricing
+        - attributes
+        - images
+        - tags
+        - printers
+        - status
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        pricing:
+          type: integer
+          format: int64
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attribute'
+        images:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          items:
+            type: string
+        printers:
+          type: array
+          items:
+            type: string
+        status:
+          $ref: '#/components/schemas/ItemStatus'
+    Attribute:
+      type: object
+      required:
+        - label
+        - options
+      properties:
+        label:
+          type: string
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+    Option:
+      type: object
+      required:
+        - label
+        - extra
+      properties:
+        label:
+          type: string
+        extra:
+          type: integer
+          format: int64
+    Pagination:
+      description: 'Pagination'
+      type: object
+      required:
+        - index
+        - limit
+        - total
+      properties:
+        index:
+          type: integer
+          format: int64
+          description: 'Current page'
+        limit:
+          type: integer
+          format: int64
+          description: 'Amount per page'
+        total:
+          type: integer
+          format: int64
+          description: 'Total page'
+  parameters:
+    IndexParam:
+      name: index
+      in: query
+      description: 'Current page index'
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    LimitParam:
+      name: limit
+      in: query
+      description: 'Total pages'
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+    ID:
+      in: path
+      name: id
+      schema:
+        type: string
+      required: true
+    StartAt:
+      in: query
+      name: startAt
+      schema:
+        type: integer
+        format: int64
+    EndAt:
+      in: query
+      name: endAt
+      schema:
+        type: integer
+        format: int64
